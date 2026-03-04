@@ -35,7 +35,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 1.  **Clone the Repository:**
     ```bash
-    git clone [https://github.com/your-username/wmsu-reoc-app.git](https://github.com/your-username/wmsu-reoc-app.git)
+    git clone https://github.com/Kenitplay/WMSU-REOC-Mobile-App.git
     cd wmsu-reoc-app
     ```
 
