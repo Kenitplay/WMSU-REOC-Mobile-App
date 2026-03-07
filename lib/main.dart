@@ -51,6 +51,7 @@
 // }
 
 
+  import 'dart:async';
   import 'dart:io';
   import 'package:flutter/material.dart';
   import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -88,12 +89,27 @@
   }
 
   class _WebViewPageState extends State<WebViewPage> {
+    static const String _loginUrl = "https://reoph.site/login";
+    static const Duration _noConnectionDelay = Duration(seconds: 10);
+
+    Timer? _connectionTimer;
 
     Future<void> requestPermissions() async {
       if (Platform.isAndroid) {
         await Permission.storage.request();
         await Permission.photos.request();
       }
+    }
+
+    void _scheduleNoConnectionFallback(InAppWebViewController controller) {
+      _connectionTimer?.cancel();
+      _connectionTimer = Timer(_noConnectionDelay, () async {
+        if (!mounted) return;
+
+        await controller.loadFile(
+          assetFilePath: "assets/no_connection.html",
+        );
+      });
     }
 
     @override
@@ -103,12 +119,19 @@
     }
 
     @override
+    void dispose() {
+      _connectionTimer?.cancel();
+      super.dispose();
+    }
+
+    @override
     Widget build(BuildContext context) {
       return Scaffold(
         body: SafeArea(
           child: InAppWebView(
-            initialUrlRequest:
-                URLRequest(url: WebUri("https://reoph.site/login")),
+            // Start by showing the custom "Connecting" HTML so the
+            // default browser error page is never visible first.
+            initialFile: "assets/connecting.html",
             initialSettings: InAppWebViewSettings(
               javaScriptEnabled: true,
               mediaPlaybackRequiresUserGesture: false,
@@ -116,8 +139,12 @@
               allowContentAccess: true,
               useOnDownloadStart: true,
             ),
-
-            // ✅ Handle permissions (camera, files, etc.)
+            onWebViewCreated: (controller) {
+              // Try to load the real site in the background.
+              controller.loadUrl(
+                urlRequest: URLRequest(url: WebUri(_loginUrl)),
+              );
+            },
             androidOnPermissionRequest:
                 (controller, origin, resources) async {
               return PermissionRequestResponse(
@@ -125,11 +152,8 @@
                 action: PermissionRequestResponseAction.GRANT,
               );
             },
-
-            // ✅ Handle file downloads
             onDownloadStartRequest:
                 (controller, downloadStartRequest) async {
-
               final url = downloadStartRequest.url.toString();
 
               await FlutterDownloader.enqueue(
@@ -144,6 +168,20 @@
                   content: Text("Downloading file..."),
                 ),
               );
+            },
+            onLoadStop: (controller, url) {
+              final current = url?.toString() ?? "";
+              // Only cancel the timer when the real site has loaded.
+              if (current.startsWith("https://reoph.site")) {
+                _connectionTimer?.cancel();
+              }
+            },
+            onLoadError:
+                (controller, url, code, message) async {
+              await controller.loadFile(
+                assetFilePath: "assets/connecting.html",
+              );
+              _scheduleNoConnectionFallback(controller);
             },
           ),
         ),
