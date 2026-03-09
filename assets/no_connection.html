@@ -3,18 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>No Connection — Earth Loader</title>
+  <title>No Connection</title>
   <style>
     :root{
       --watercolor:#3344c1;
       --landcolor:#7cc133;
       --no-red:#d93b3b;
-      --loader-size:7.5em; /* scale whole thing */
+      --loader-size:7.5em; 
       --no-thickness:0.25em;
 
-      /* timing */
-      --stop-time: 2.12s;         /* earth stops + ring/slash appear */
-      --pop-time: 460ms;          /* ring/slash animation duration */
+      --stop-time: 2.12s;         
+      --pop-time: 460ms;          
       --delayed-spin-offset: 0.75s;
     }
 
@@ -50,12 +49,9 @@
         inset 0em 0.5em rgb(255 255 255 / 0.25),
         inset 0em -0.5em rgb(0 0 0 / 0.25);
       border: solid 0.15em white;
-      animation: startround 1s;
-      animation-iteration-count: 1;
       transform: translateZ(0);
     }
 
-    /* NO SIGN OVERLAY (placed outside earth-loader so ring isn't clipped) */
     .no-sign {
       --outer-size: var(--loader-size);
 
@@ -109,10 +105,8 @@
       margin:0;
     }
 
-    /* Earth SVG layers */
     .earth-loader svg { display:block; pointer-events:none; will-change: transform, left, opacity; }
 
-    /* Spin only until --stop-time, then freeze */
     .earth-loader svg:nth-child(1) {
       position:absolute;
       bottom:-2em;
@@ -152,15 +146,6 @@
       animation-duration: calc(var(--stop-time) - var(--delayed-spin-offset));
     }
 
-    /* ORIGINAL earth start animation (restored) */
-    @keyframes startround {
-      0% { filter: brightness(500%); box-shadow:none; }
-      75% { filter: brightness(500%); box-shadow:none; }
-      100% { filter: brightness(100%); box-shadow:
-        inset 0em 0.5em rgb(255 255 255 / 0.25),
-        inset 0em -0.5em rgb(0 0 0 / 0.25); }
-    }
-
     @keyframes round1 {
       0% { left:-2em; opacity:1; transform: skewX(0deg) rotate(0deg); }
       30% { left:-6em; opacity:1; transform: skewX(-25deg) rotate(25deg); }
@@ -178,7 +163,6 @@
       100% { left:5em; opacity:1; transform: skewX(0deg) rotate(0deg); }
     }
 
-    /* no-sign animations */
     @keyframes nosign-pop {
       0% { opacity: 0; transform: translate(-50%,-50%) scale(0.9); }
       60% { opacity: 1; transform: translate(-50%,-50%) scale(1.03); }
@@ -204,7 +188,7 @@
 <body>
   <div class="earth" role="status" aria-live="polite" aria-busy="false">
     <div class="earth-loader" aria-hidden="false">
-      <!-- Earth vector layers -->
+  
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
         <path transform="translate(100 100)"
           d="M29.4,-17.4C33.1,1.8,27.6,16.1,11.5,31.6C-4.7,47,-31.5,63.6,-43,56C-54.5,48.4,-50.7,16.6,-41,-10.9C-31.3,-38.4,-15.6,-61.5,-1.4,-61C12.8,-60.5,25.7,-36.5,29.4,-17.4Z"
@@ -230,7 +214,6 @@
       </svg>
     </div>
 
-    <!-- ring + slash appear same time earth stops -->
     <div class="no-sign" aria-hidden="true">
       <div class="ring" role="presentation"></div>
       <div class="slash" role="presentation"></div>
