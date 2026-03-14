@@ -50,124 +50,122 @@
 //   }
 // }
 
+import 'dart:async';
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-  import 'dart:async';
-  import 'dart:io';
-  import 'package:flutter/material.dart';
-  import 'package:flutter/services.dart';
-  import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-  import 'package:flutter_downloader/flutter_downloader.dart';
-  import 'package:permission_handler/permission_handler.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-  void main() async {
-    WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+    systemNavigationBarColor: Colors.white,
+    systemNavigationBarIconBrightness: Brightness.dark,
+    systemNavigationBarDividerColor: Colors.white,
+  ));
 
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: Colors.white,
-      systemNavigationBarIconBrightness: Brightness.dark,
-      systemNavigationBarDividerColor: Colors.white,
-    ));
+  await FlutterDownloader.initialize(
+    debug: true,
+    ignoreSsl: true,
+  );
 
-    await FlutterDownloader.initialize(
-      debug: true,
-      ignoreSsl: true,
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: WebViewPage(),
     );
-
-    runApp(const MyApp());
   }
+}
 
-  class MyApp extends StatelessWidget {
-    const MyApp({super.key});
+class WebViewPage extends StatefulWidget {
+  const WebViewPage({super.key});
 
-    @override
-    Widget build(BuildContext context) {
-      return const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: WebViewPage(),
-      );
+  @override
+  State<WebViewPage> createState() => _WebViewPageState();
+}
+
+class _WebViewPageState extends State<WebViewPage> {
+  static const String _loginUrl = "https://reoph.site/login";
+  static const String _offlineAsset = "assets/internet.html";
+  static const Duration _connectionCheckInterval = Duration(seconds: 4);
+
+  bool? _isOnline;
+  InAppWebViewController? _webController;
+  Timer? _connectionCheckTimer;
+
+  Future<void> requestPermissions() async {
+    if (Platform.isAndroid) {
+      await Permission.storage.request();
+      await Permission.photos.request();
     }
   }
 
-  class WebViewPage extends StatefulWidget {
-    const WebViewPage({super.key});
-
-    @override
-    State<WebViewPage> createState() => _WebViewPageState();
+  Future<void> _checkConnection() async {
+    try {
+      await InternetAddress.lookup("reoph.site");
+      if (mounted) setState(() => _isOnline = true);
+    } on SocketException catch (_) {
+      if (mounted) setState(() => _isOnline = false);
+    }
   }
 
-  class _WebViewPageState extends State<WebViewPage> {
-    static const String _loginUrl = "https://reoph.site/login";
-    static const String _offlineAsset = "assets/offline.html";
-    static const Duration _connectionCheckInterval = Duration(seconds: 4);
-
-    bool? _isOnline;
-    InAppWebViewController? _webController;
-    Timer? _connectionCheckTimer;
-
-    Future<void> requestPermissions() async {
-      if (Platform.isAndroid) {
-        await Permission.storage.request();
-        await Permission.photos.request();
-      }
-    }
-
-    Future<void> _checkConnection() async {
+  void _startConnectionCheckTimer() {
+    _connectionCheckTimer?.cancel();
+    _connectionCheckTimer = Timer.periodic(_connectionCheckInterval, (_) async {
+      if (!mounted) return;
       try {
         await InternetAddress.lookup("reoph.site");
-        if (mounted) setState(() => _isOnline = true);
-      } on SocketException catch (_) {
-        if (mounted) setState(() => _isOnline = false);
-      }
-    }
-
-    void _startConnectionCheckTimer() {
-      _connectionCheckTimer?.cancel();
-      _connectionCheckTimer = Timer.periodic(_connectionCheckInterval, (_) async {
         if (!mounted) return;
-        try {
-          await InternetAddress.lookup("reoph.site");
-          if (!mounted) return;
-          _connectionCheckTimer?.cancel();
-          await _webController?.loadUrl(
-            urlRequest: URLRequest(url: WebUri(_loginUrl)),
-          );
-        } on SocketException catch (_) {}
-      });
-    }
+        _connectionCheckTimer?.cancel();
+        await _webController?.loadUrl(
+          urlRequest: URLRequest(url: WebUri(_loginUrl)),
+        );
+      } on SocketException catch (_) {}
+    });
+  }
 
-    @override
-    void initState() {
-      super.initState();
-      requestPermissions();
-      _checkConnection();
-    }
+  @override
+  void initState() {
+    super.initState();
+    requestPermissions();
+    _checkConnection();
+  }
 
-    @override
-    void dispose() {
-      _connectionCheckTimer?.cancel();
-      super.dispose();
-    }
+  @override
+  void dispose() {
+    _connectionCheckTimer?.cancel();
+    super.dispose();
+  }
 
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          top: false,
-          bottom: false,
-          left: false,
-          right: false,
-          child: _isOnline == null
-              ? const SizedBox.expand()
-              : Container(
-                  color: Colors.white,
-                  child: InAppWebView(
-                  initialUrlRequest: _isOnline!
-                      ? URLRequest(url: WebUri(_loginUrl))
-                      : null,
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        left: false,
+        right: false,
+        child: _isOnline == null
+            ? const SizedBox.expand()
+            : Container(
+                color: Colors.white,
+                child: InAppWebView(
+                  initialUrlRequest:
+                      _isOnline! ? URLRequest(url: WebUri(_loginUrl)) : null,
                   initialFile: _isOnline! ? null : _offlineAsset,
                   initialSettings: InAppWebViewSettings(
                     javaScriptEnabled: true,
@@ -175,8 +173,10 @@
                     allowFileAccess: true,
                     allowContentAccess: true,
                     useOnDownloadStart: true,
-                    transparentBackground: false,
+                    transparentBackground: true,
                     domStorageEnabled: true,
+                    disableVerticalScroll: true,
+                    disableHorizontalScroll: true,
                   ),
                   onWebViewCreated: (controller) {
                     _webController = controller;
@@ -210,19 +210,15 @@
                       ),
                     );
                   },
-                  onLoadError:
-                      (controller, url, code, message) async {
+                  onLoadError: (controller, url, code, message) async {
                     await controller.loadFile(
                       assetFilePath: _offlineAsset,
                     );
                     _startConnectionCheckTimer();
                   },
                 ),
-                ),
-        ),
-      );
-    }
+              ),
+      ),
+    );
   }
-
-
-
+}

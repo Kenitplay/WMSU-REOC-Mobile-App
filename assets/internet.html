@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>No Internet</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, Helvetica, sans-serif;
+}
+
+html{
+overflow: hidden;
+scrollbar-width: none;
+-ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+display: none;
+width: 0;
+height: 0;
+}
+
+body{
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+background:#ffffff;
+color:#333;
+padding:20px;
+overflow: hidden;
+}
+
+.building{
+width:250px;
+margin-bottom:30px;
+}
+
+h1{
+font-size:30px;
+color:#c62828;
+margin-bottom:10px;
+font-weight: bold;
+}
+
+p{
+font-size:14px;
+color:#666;
+margin-bottom:30px;
+}
+
+button{
+background:#c62828;
+border:none;
+color:white;
+padding:12px 28px;
+border-radius:20px;
+font-size:15px;
+cursor:pointer;
+width:150px;
+}
+
+button:active{
+transform:scale(.97);
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Whoops! <br> You got no Internet</h1>
+
+<svg class="building" viewBox="0 0 200 180">
+
+<defs>
+
+<linearGradient id="buildingGrad" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0%" stop-color="#ff6b6b"/>
+<stop offset="100%" stop-color="#b71c1c"/>
+</linearGradient>
+
+<linearGradient id="roofGrad" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0%" stop-color="#ef5350"/>
+<stop offset="100%" stop-color="#8e0000"/>
+</linearGradient>
+
+<linearGradient id="blobGrad" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0%" stop-color="#f6f6f6"/>
+<stop offset="100%" stop-color="#ececec"/>
+</linearGradient>
+
+</defs>
+
+<path d="M30 120
+Q10 70 55 35
+Q100 10 145 40
+Q185 70 160 120
+Q135 160 85 155
+Q45 150 30 120"
+fill="url(#blobGrad)"/>
+
+<ellipse cx="100" cy="145" rx="40" ry="8" fill="#eee"/>
+
+<rect x="65" y="70" width="70" height="65" rx="10" fill="url(#buildingGrad)"/>
+
+<polygon points="60,70 100,45 140,70" fill="url(#roofGrad)"/>
+
+<rect x="75" y="82" width="12" height="12" rx="2" fill="white"/>
+<rect x="94" y="82" width="12" height="12" rx="2" fill="white"/>
+<rect x="113" y="82" width="12" height="12" rx="2" fill="white"/>
+
+<rect x="75" y="102" width="12" height="12" rx="2" fill="white"/>
+<rect x="94" y="102" width="12" height="12" rx="2" fill="white"/>
+<rect x="113" y="102" width="12" height="12" rx="2" fill="white"/>
+
+<rect x="95" y="118" width="12" height="17" rx="3" fill="white"/>
+
+<path d="M70 40 Q100 15 130 40"
+stroke="#c62828"
+stroke-width="4"
+fill="none"
+stroke-linecap="round"/>
+
+<path d="M80 50 Q100 35 120 50"
+stroke="#c62828"
+stroke-width="4"
+fill="none"
+stroke-linecap="round"/>
+
+<circle cx="100" cy="60" r="4" fill="#c62828"/>
+
+<line x1="70" y1="25" x2="130" y2="65"
+stroke="#c62828"
+stroke-width="4"
+stroke-linecap="round"/>
+
+</svg>
+
+<p>Please check your connection or connect to Wi-Fi</p>
+
+<button onclick="location.reload()">Retry</button>
+
+</body>
+</html>
