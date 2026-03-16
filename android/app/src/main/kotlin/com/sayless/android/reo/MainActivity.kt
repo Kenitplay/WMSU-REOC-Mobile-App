@@ -1,4 +1,4 @@
-package com.sayless.reo
+package com.sayless.android.reo
 
 import io.flutter.embedding.android.FlutterActivity
 
