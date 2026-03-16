@@ -155,8 +155,8 @@ class _WebViewPageState extends State<WebViewPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        top: false,
-        bottom: false,
+        top: true,
+        bottom: true,
         left: false,
         right: false,
         child: _isOnline == null
@@ -175,25 +175,22 @@ class _WebViewPageState extends State<WebViewPage> {
                     useOnDownloadStart: true,
                     transparentBackground: true,
                     domStorageEnabled: true,
-                    disableVerticalScroll: true,
-                    disableHorizontalScroll: true,
+                    disallowOverScroll: true,
                   ),
                   onWebViewCreated: (controller) {
                     _webController = controller;
                     if (_isOnline == false) _startConnectionCheckTimer();
-                  },
-                  androidOnPermissionRequest:
-                      (controller, origin, resources) async {
-                    return PermissionRequestResponse(
-                      resources: resources,
-                      action: PermissionRequestResponseAction.GRANT,
-                    );
                   },
                   onLoadStop: (controller, url) {
                     final u = url?.toString() ?? "";
                     if (u.startsWith("https://reoph.site")) {
                       _connectionCheckTimer?.cancel();
                     }
+                    // Optimization and Restrictions
+                    controller.evaluateJavascript(
+                      source:
+                          "(function(){var css=document.createElement('style');css.textContent='*{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;-webkit-user-drag:none!important;will-change:auto!important;}::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;}';document.head.appendChild(css);document.addEventListener('selectstart',e=>e.preventDefault(),true);document.addEventListener('contextmenu',e=>e.preventDefault(),true);document.addEventListener('copy',e=>e.preventDefault(),true);document.addEventListener('cut',e=>e.preventDefault(),true);document.addEventListener('paste',e=>e.preventDefault(),true);var touchStartTime=0;document.addEventListener('touchstart',e=>{touchStartTime=Date.now()},true);document.addEventListener('touchend',e=>{if(Date.now()-touchStartTime>500){e.preventDefault();}},true);window.oncontextmenu=()=>false;window.oncopy=()=>false;})()",
+                    );
                   },
                   onDownloadStartRequest:
                       (controller, downloadStartRequest) async {

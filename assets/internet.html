@@ -1,29 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="overflow: hidden; scrollbar-width: none; -ms-overflow-style: none; margin: 0; padding: 0; width: 100%; height: 100%; background: #ffffff;">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
 <title>No Internet</title>
 
 <style>
+html, body {
+  overflow: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  -webkit-scrollbar: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: #ffffff !important;
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar, ::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
 
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
 font-family:Arial, Helvetica, sans-serif;
-}
-
-html{
-overflow: hidden;
-scrollbar-width: none;
--ms-overflow-style: none;
-}
-
-html::-webkit-scrollbar {
-display: none;
-width: 0;
-height: 0;
+-webkit-user-select: none;
+user-select: none;
+-webkit-touch-callout: none;
+-webkit-user-drag: none;
+user-drag: none;
 }
 
 body{
@@ -37,24 +48,26 @@ background:#ffffff;
 color:#333;
 padding:20px;
 overflow: hidden;
+contain: layout style paint;
 }
 
 .building{
 width:250px;
 margin-bottom:30px;
+flex-shrink: 0;
 }
 
 h1{
 font-size:30px;
 color:#c62828;
-margin-bottom:10px;
-font-weight: bold;
+flex-shrink: 0;
 }
 
 p{
 font-size:14px;
 color:#666;
 margin-bottom:30px;
+flex-shrink: 0;
 }
 
 button{
@@ -66,6 +79,9 @@ border-radius:20px;
 font-size:15px;
 cursor:pointer;
 width:150px;
+flex-shrink: 0;
+-webkit-appearance: none;
+appearance: none;
 }
 
 button:active{
@@ -148,6 +164,31 @@ stroke-linecap="round"/>
 <p>Please check your connection or connect to Wi-Fi</p>
 
 <button onclick="location.reload()">Retry</button>
+
+<script>
+
+document.addEventListener('selectstart', (e) => e.preventDefault(), false);
+document.addEventListener('contextmenu', (e) => e.preventDefault(), false);
+document.addEventListener('copy', (e) => e.preventDefault(), false);
+document.addEventListener('cut', (e) => e.preventDefault(), false);
+document.addEventListener('paste', (e) => e.preventDefault(), false);
+document.addEventListener('touchstart', (e) => {
+  if (e.touches.length > 1) e.preventDefault();
+}, false);
+document.addEventListener('touchend', (e) => e.preventDefault(), false);
+document.body.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+
+window.oncontextmenu = () => false;
+window.oncopy = () => false;
+window.oncut = () => false;
+window.onpaste = () => false;
+
+Document.prototype.onselectstart = () => false;
+if (document.body) {
+  document.body.onselectstart = () => false;
+  document.body.ondragstart = () => false;
+}
+</script>
 
 </body>
 </html>
